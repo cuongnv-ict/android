@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+	     <LinearLayout
+	           android:background="@drawable/form_dn"
+	           android:layout_width="fill_parent"
+	           android:layout_height="45dip"
+	           android:orientation="horizontal"
+	           android:layout_marginTop="7dip"
+	           android:layout_marginLeft="3dip"
+	           android:layout_marginRight="3dip"
+	            >
+	           <TextView
+	             	  android:layout_width="wrap_content"
+	             	  android:layout_height="wrap_content"
+	             	  android:text="Tài khoản :"
+	             	  android:paddingLeft="3dip"
+	             	  />
+	            <EditText
+	             	  android:id="@+id/user_dropbox"
+	             	  android:layout_width="fill_parent"
+	             	  android:layout_height="wrap_content"
+	             	  android:singleLine="true"
+	             	  android:paddingRight="3dip"
+	             	  />
+	            </LinearLayout>
+	            <LinearLayout
+	             	   android:layout_width="fill_parent"
+	             	   android:layout_height="45dip"
+	             	   android:orientation="horizontal"
+	             	   android:background="@drawable/form_dn"
+	             	   android:layout_marginTop="7dip"
+	             	   android:layout_marginLeft="3dip"
+	             	   android:layout_marginRight="3dip"
+	             	   >
+	             	   <TextView
+	             	        android:layout_width="wrap_content"
+	             	        android:layout_height="wrap_content"
+	             	        android:text="Mật khẩu :"
+	             	        android:paddingLeft="3dip"
+	             	           />
+	             	    <EditText
+	             	        android:id="@+id/pass_dropbox"
+	             	        android:layout_width="fill_parent"
+	             	        android:layout_height="wrap_content"
+	             	        android:singleLine="true"
+	             	        android:password="true"
+	             	        android:paddingRight="3dip"
+	             	            />
+	             	    </LinearLayout>
+	             	    <ImageView
+	             	        android:id="@+id/btn_dn_dropbox"
+	             	        android:layout_width="wrap_content"
+	             	        android:layout_height="45dip"
+	             	        android:layout_weight="0.5"
+	             	        android:layout_gravity="center"
+	             	        android:layout_marginTop="7dip"
+	             	        android:src="@drawable/btn_dn_dropbox"
+	             	        />        
+</LinearLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" 
+    android:background="#e8e8e8"
+    >
+    <ImageView
+        android:id="@+id/icon_user"
+        android:layout_width="wrap_content"
+        android:layout_height="45dip"
+        android:background="@drawable/icon_user"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dip"
+        >
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Trần Hải Nam"
+            android:textSize="18dip"
+            />
+        <TextView
+            android:id="@+id/telephoneNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="097 456 1735"
+            android:textColor="#f80a0a"
+            />
+    </LinearLayout>    
+
+</LinearLayout>

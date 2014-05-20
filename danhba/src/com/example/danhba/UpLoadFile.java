@@ -42,7 +42,7 @@ public class UpLoadFile extends AsyncTask<Void, Void, Boolean> {
 			tempFile = File.createTempFile("FileContact", ".txt", tempDir);
 			fr = new FileWriter(tempFile);
 			Vector v = new Vector();
-				v= ac.readContacts2();
+				v= ac.getVecTor();
 			ArrayList <?> s;
 			for (int i = 0; i < v.size(); i++) {
 				s = (ArrayList) v.get(i);

@@ -639,7 +639,8 @@ public class MainActivity extends TabActivity {
 		{
 			db=mDBHelper.getReadableDatabase();
 			String [] output= {Feedentry.Id,Feedentry.Name,Feedentry.DiDong,Feedentry.DienThoai,Feedentry.Email,Feedentry.ToChuc,Feedentry.DiaChi};
-			Cursor c = db.query(Feedentry.TableName,output ,null , null, null, null, null);
+			String sortName= Feedentry.Name + " ASC";
+			Cursor c = db.query(Feedentry.TableName,output ,null , null, null, null, sortName);
 			c.moveToFirst();
 			
 			do
@@ -714,7 +715,8 @@ public class MainActivity extends TabActivity {
 			String [] output= {Feedentry.Id,Feedentry.Name,Feedentry.DiDong,Feedentry.DienThoai,Feedentry.Email,Feedentry.ToChuc,Feedentry.DiaChi};
 			String whereClause= Feedentry.Name + " LIKE ? ";
 			String [] whereArgs= {"%"+name+"%"};
-			Cursor c = db.query(Feedentry.TableName,output , whereClause , whereArgs , null, null, null);
+			String sortName= Feedentry.Name + " ASC";
+			Cursor c = db.query(Feedentry.TableName,output , whereClause , whereArgs , null, null, sortName);
 			c.moveToFirst();
 			do
 			{
@@ -730,6 +732,46 @@ public class MainActivity extends TabActivity {
 				adapter.notifyDataSetChanged();
 			}
 			while(c.moveToNext());
+		}
+		public void xoa(int id)
+		{
+			db=mDBHelper.getWritableDatabase();
+			String where = Feedentry._ID + " = ? ";
+			String [] wherearg={Integer.toString(id)};
+			db.delete(Feedentry.TableName,where , wherearg);
+		}
+		public Vector getVecTor()
+		{
+			Vector v=new Vector();
+			db=mDBHelper.getReadableDatabase();
+			String [] output= {Feedentry.Id,Feedentry.Name,Feedentry.DiDong,Feedentry.DienThoai,Feedentry.Email,Feedentry.ToChuc,Feedentry.DiaChi};
+			String sortName= Feedentry.Name + " ASC";
+			Cursor c = db.query(Feedentry.TableName,output ,null , null, null, null, sortName);
+			c.moveToFirst();
+			
+			do
+			{
+
+				ArrayList info = new ArrayList();
+				Contacter contacter = new Contacter();
+				contacter.SetId(Integer.parseInt(c.getString(0)));
+				contacter.SetName(c.getString(1));
+				contacter.SetDidong(c.getString(2));
+				contacter.SetDienthoai(c.getString(3));
+				contacter.SetEmail(c.getString(4));
+				contacter.SetTochuc(c.getString(5));
+				contacter.SetDiachi(c.getString(6));
+				info.add(c.getString(0));
+				info.add(c.getString(1));
+				info.add(c.getString(2));
+				info.add(c.getString(3));
+				info.add(c.getString(4));
+				info.add(c.getString(5));
+				info.add(c.getString(6));
+				v.add(info);
+			}
+			while(c.moveToNext());
+			return v;
 		}
 	/*___________________________________________________________________________________________________ */
 }

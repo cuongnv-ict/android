@@ -37,12 +37,13 @@
                  <ImageButton
                      android:id="@+id/add_contact"
                      android:layout_width="wrap_content"
-                      android:layout_height="45dip"
+                     android:layout_height="45dip"
                      android:src="@drawable/add_contact"
                      />
                  <EditText
+                     android:id="@+id/Search"
                      android:layout_width="fill_parent"
-                      android:layout_height="45dip"
+                     android:layout_height="45dip"
                      android:hint="Nhập từ khóa tìm kiếm"
                      />
             </LinearLayout>

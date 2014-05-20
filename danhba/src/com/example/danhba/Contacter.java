@@ -10,6 +10,15 @@ public class Contacter {
 	private String email;
 	private String tochuc;
 	private ImageView image;
+	private int id;
+	public void SetId(int id)
+	{
+		this.id=id;
+	}
+	public int GetId()
+	{
+		return id;
+	}
 	public void SetName(String name)
 	{
 		this.name=name;

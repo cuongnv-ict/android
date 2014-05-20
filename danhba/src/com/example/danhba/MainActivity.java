@@ -14,6 +14,7 @@ import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.TokenPair;
+import com.example.danhba.FeedReaderContract.Feedentry;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,13 +25,17 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TabActivity;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -39,6 +44,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DialerFilter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -55,6 +61,9 @@ public class MainActivity extends TabActivity {
 	ArrayList<Contacter> array = null;
 	MyAdapter adapter = null;
 	ListView list;
+	private FeedReaderDBHelper mDBHelper= new FeedReaderDBHelper(this);
+	private SQLiteDatabase db;
+	EditText Ed_search;
 	/* _____________________________________________DropBox__________________________________________________ */
 	final static private String APP_KEY = "04ad6fz9fodrhyb";
 	final static private String APP_SECRET = "w6kexon2w8f3iog";
@@ -86,15 +95,20 @@ public class MainActivity extends TabActivity {
 		login_dropbox = (ImageView) findViewById(R.id.login_dropbox);
 		btn_add_contact = (ImageView) findViewById(R.id.add_contact);
 		list = (ListView) findViewById(R.id.list_show);
+		Ed_search= (EditText) findViewById(R.id.Search);
+		
 		// khoi tao cac mang array
 		array = new ArrayList<Contacter>();
 		adapter = new MyAdapter(this, R.layout.row_list, array);
 		list.setAdapter(adapter);
+		readDatabase();
 
 		/*
 		 * ____________________________________click vào
 		 * listview_______________________________
 		 */
+		
+		
 
 		list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
@@ -136,6 +150,31 @@ public class MainActivity extends TabActivity {
 		});
 		// _______________________________________________________________________________________
 
+		
+		/*______________________________________sukientimkiem____________________________________ */
+		Ed_search.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+				search(s.toString());
+			}
+		});
+		/*_______________________________________________________________________________________ */
+		
 		// ***********************
 		update_contact_machine = (ImageView) findViewById(R.id.update_contact_machine);
 		// update_contact_dropbox = (ImageView)
@@ -277,27 +316,31 @@ public class MainActivity extends TabActivity {
 
 		dialog.setNegativeButton("Đồng ý",
 				new DialogInterface.OnClickListener() {
-
+					int id;
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 
 						Vector contact = readContacts2();
 						Toast.makeText(MainActivity.this, "thanh cong",
 								Toast.LENGTH_SHORT).show();
+
+						array.clear();
+						adapter.notifyDataSetChanged();
 						for (int i = 0; i < contact.size(); i++) {
 							ArrayList a = new ArrayList();
 							// arraylist a chua thong tin cua mot nguoi
 							a = (ArrayList) contact.get(i);
-							Contacter contacter = new Contacter();
-							contacter.SetName(a.get(0).toString());
-							contacter.SetDidong(a.get(1).toString());
-							contacter.SetDienthoai(a.get(2).toString());
-							contacter.SetEmail(a.get(3).toString());
-							contacter.SetTochuc(a.get(4).toString());
-							contacter.SetDiachi(a.get(5).toString());
-							array.add(contacter);
-							adapter.notifyDataSetChanged();
+							id= Integer.parseInt(a.get(0).toString());
+							System.out.println("ket qua tra ve" + checkDatabase(id));
+							if(checkDatabase(id))
+							{
+								writeDatabase(Integer.parseInt(a.get(0).toString()), a.get(1).toString(), a.get(2).toString(), a.get(3).toString(), a.get(4).toString(), a.get(5).toString(), a.get(6).toString());
+								
+							}
+							
+							
 						}
+						readDatabase();
 
 					}
 				});
@@ -418,6 +461,8 @@ public class MainActivity extends TabActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// Nếu kết quả code trả về là "RESULT_OK" với đoạn REQUEST_CODE tương
 		// ứng
+		array.clear();
+		adapter.notifyDataSetChanged();
 		if (resultCode == RESULT_OK && requestCode == 1) {
 			String name = data.getStringExtra("name");
 			String didong = data.getStringExtra("didong");
@@ -427,28 +472,15 @@ public class MainActivity extends TabActivity {
 			String email = data.getStringExtra("email");
 			if (!name.equals("")) {
 				if (!didong.equals("")) {
-					Contacter contacter = new Contacter();
-					contacter.SetDiachi(diachi);
-					contacter.SetDidong(didong);
-					contacter.SetDienthoai(dienthoai);
-					contacter.SetEmail(email);
-					contacter.SetName(name);
-					contacter.SetTochuc(tochuc);
-					array.add(contacter);
-					adapter.notifyDataSetChanged();
+					int id=array.size()+1000;
+					writeDatabase(id, name, didong, dienthoai, email, tochuc, diachi);
 				} else if (!dienthoai.equals("")) {
-					Contacter contacter = new Contacter();
-					contacter.SetDiachi(diachi);
-					contacter.SetDidong(didong);
-					contacter.SetDienthoai(dienthoai);
-					contacter.SetEmail(email);
-					contacter.SetName(name);
-					contacter.SetTochuc(tochuc);
-					array.add(contacter);
-					adapter.notifyDataSetChanged();
+					int id=array.size()+1000;
+					writeDatabase(id, name, didong, dienthoai, email, tochuc, diachi);
 				}
 			}
 		}
+		readDatabase();
 	}
 
 	/* ___________________________________________________________________________________________ */
@@ -456,162 +488,248 @@ public class MainActivity extends TabActivity {
 	/* ___________________________________ReadContact____________________________________________________ */
 
 	public Vector readContacts2() {
+		  StringBuffer sb = new StringBuffer();
+		  Vector v = new Vector();
+		  sb.append("......Contact Details.....");
+		  ContentResolver cr = getContentResolver();
+		  Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
+		    null, null, null);
+		  String phone = null;
+		  String mobile = "00null";
+		  String homephone = "00null";
+		  String emailContact = "00null";
+		  String emailType = null;
+		  String phoneType = null;
+		  String address = "00null";
+		  String company = "00null";
+		  String image_uri = "";
+		  Bitmap bitmap = null;
+		  if (cur.getCount() > 0) {
+		   while (cur.moveToNext()) {
+			 ArrayList info = new ArrayList();
+		    String id = cur.getString(cur
+		      .getColumnIndex(ContactsContract.Contacts._ID));
+		    info.add(id);
+		    String name = cur
+		      .getString(cur
+		        .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
-		Log.d("sai", "lam");
-		StringBuffer sb = new StringBuffer();
-		Vector v = new Vector();
-		sb.append("......Contact Details.....");
-		ContentResolver cr = getContentResolver();
-		Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
-				null, null, null);
-		String phone = null;
-		String mobile = "00null";
-		String homephone = "00null";
-		String emailContact = "00null";
-		String emailType = null;
-		String phoneType = null;
-		String address = "00null";
-		String company = "00null";
-		String image_uri = "";
-		Bitmap bitmap = null;
-		if (cur.getCount() > 0) {
-			while (cur.moveToNext()) {
-				ArrayList info = new ArrayList();
-				String id = cur.getString(cur
-						.getColumnIndex(ContactsContract.Contacts._ID));
-				String name = cur
-						.getString(cur
-								.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+		    image_uri = cur
+		      .getString(cur
+		        .getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+		    if (Integer
+		      .parseInt(cur.getString(cur
+		        .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+		     System.out.println("name : " + name + ", ID : " + id);
+		     sb.append("\n Contact Name:" + name);
+		     info.add(name);
+		     //lay so dien thoai
+		     Cursor pCur = cr.query(
+		       ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+		       null,
+		       ContactsContract.CommonDataKinds.Phone.CONTACT_ID
+		         + " = ?", new String[] { id }, null);
+		     while (pCur.moveToNext()) {
+		      phone = pCur
+		        .getString(pCur
+		          .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+		      phoneType = pCur
+		    	        .getString(pCur
+		    	          .getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+		      sb.append("\n Phone number:" + phone + " type: "+phoneType);
+		      if(phoneType.equals("1")){
+		    	  homephone = phone;
+		      }
+		      if(phoneType.equals("2")){
+		    	  mobile = phone;
+		      }
+		      System.out.println("phone" + phone);
+		     }
+		     info.add(mobile);
+		     info.add(homephone);
+		     pCur.close();
+		     //lay Email
+		     Cursor emailCur = cr.query(
+		       ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+		       null,
+		       ContactsContract.CommonDataKinds.Email.CONTACT_ID
+		         + " = ?", new String[] { id }, null);
+		     while (emailCur.moveToNext()) {
+		      emailContact = emailCur
+		        .getString(emailCur
+		          .getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+		      emailType = emailCur
+		        .getString(emailCur
+		          .getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
+		      sb.append("\nEmail:" + emailContact + "Email type:" + emailType);
+		      System.out.println("Email " + emailContact
+		        + " Email Type : " + emailType);
+		     }
+		     info.add(emailContact);
+		     emailCur.close();
+	// lay ten cong ty
+		     
+		     String orgWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
+		     String[] orgWhereParams = new String[]{id,
+		         ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE};
+		     Cursor orgCur = cr.query(ContactsContract.Data.CONTENT_URI,
+		                 null, orgWhere, orgWhereParams, null);
+		     if (orgCur.moveToFirst()) {
+		         String orgName = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.DATA));
+		         sb.append("\n Company:"+ orgName);
+		         String title = orgCur.getString(orgCur.getColumnIndex(ContactsContract.CommonDataKinds.Organization.TITLE));
+		         company = orgName;
+		     }
+		     info.add(company);
+		     orgCur.close();
+		     // tim dia chi
+		     String addrWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
+		     String[] addrWhereParams = new String[]{id,
+		         ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE};
+		     Cursor AddrCur = cr.query(ContactsContract.Data.CONTENT_URI,
+		                 null,addrWhere, addrWhereParams, null);
+		     if (AddrCur.moveToFirst()) {
+		         String orgName = AddrCur.getString(AddrCur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.DATA));
+		         sb.append("\n address:"+ orgName);
+		         address = orgName;
+		     }
+		     info.add(address);
+		     AddrCur.close();
+		    }
+		    
+		    if (image_uri != null) {
+		     System.out.println(Uri.parse(image_uri));
+		     try {
+		      bitmap = MediaStore.Images.Media
+		        .getBitmap(this.getContentResolver(),
+		          Uri.parse(image_uri));
+		      sb.append("\n Image in Bitmap:" + bitmap);
+		      System.out.println(bitmap);
 
-				image_uri = cur
-						.getString(cur
-								.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-				if (Integer
-						.parseInt(cur.getString(cur
-								.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-					System.out.println("name : " + name + ", ID : " + id);
-					sb.append("\n Contact Name:" + name);
-					info.add(name);
-					// lay so dien thoai
-					Cursor pCur = cr.query(
-							ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-							null,
-							ContactsContract.CommonDataKinds.Phone.CONTACT_ID
-									+ " = ?", new String[] { id }, null);
-					while (pCur.moveToNext()) {
-						phone = pCur
-								.getString(pCur
-										.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-						phoneType = pCur
-								.getString(pCur
-										.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-						sb.append("\n Phone number:" + phone + " type: "
-								+ phoneType);
-						if (phoneType.equals("1")) {
-							homephone = phone;
-						}
-						if (phoneType.equals("2")) {
-							mobile = phone;
-						}
-						System.out.println("phone" + phone);
-					}
-					info.add(mobile);
-					info.add(homephone);
-					pCur.close();
-					// lay Email
-					Cursor emailCur = cr.query(
-							ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-							null,
-							ContactsContract.CommonDataKinds.Email.CONTACT_ID
-									+ " = ?", new String[] { id }, null);
-					while (emailCur.moveToNext()) {
-						emailContact = emailCur
-								.getString(emailCur
-										.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-						emailType = emailCur
-								.getString(emailCur
-										.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
-						sb.append("\nEmail:" + emailContact + "Email type:"
-								+ emailType);
-						System.out.println("Email " + emailContact
-								+ " Email Type : " + emailType);
-					}
-					info.add(emailContact);
-					emailCur.close();
-					// lay ten cong ty
+		     } catch (FileNotFoundException e) {
+		      // TODO Auto-generated catch block
+		      e.printStackTrace();
+		     } catch (IOException e) {
+		      // TODO Auto-generated catch block
+		      e.printStackTrace();
+		     }
 
-					String orgWhere = ContactsContract.Data.CONTACT_ID
-							+ " = ? AND " + ContactsContract.Data.MIMETYPE
-							+ " = ?";
-					String[] orgWhereParams = new String[] {
-							id,
-							ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE };
-					Cursor orgCur = cr.query(ContactsContract.Data.CONTENT_URI,
-							null, orgWhere, orgWhereParams, null);
-					if (orgCur.moveToFirst()) {
-						String orgName = orgCur
-								.getString(orgCur
-										.getColumnIndex(ContactsContract.CommonDataKinds.Organization.DATA));
-						sb.append("\n Company:" + orgName);
-						String title = orgCur
-								.getString(orgCur
-										.getColumnIndex(ContactsContract.CommonDataKinds.Organization.TITLE));
-						company = orgName;
-					}
-					info.add(company);
-					orgCur.close();
-					// tim dia chi
-					String addrWhere = ContactsContract.Data.CONTACT_ID
-							+ " = ? AND " + ContactsContract.Data.MIMETYPE
-							+ " = ?";
-					String[] addrWhereParams = new String[] {
-							id,
-							ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE };
-					Cursor AddrCur = cr.query(
-							ContactsContract.Data.CONTENT_URI, null, addrWhere,
-							addrWhereParams, null);
-					if (AddrCur.moveToFirst()) {
-						String orgName = AddrCur
-								.getString(AddrCur
-										.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.DATA));
-						sb.append("\n address:" + orgName);
-						address = orgName;
-					}
-					info.add(address);
-					AddrCur.close();
-				}
+		    }
+		   
+		    
+		    sb.append("\n........................................");
+		    v.add(info);
+		    //reset lai cac gia tri
+		    mobile = "00null";
+			homephone = "00null";
+			emailContact = "00null";
+			address = "00null";
+			company = "00null";
+		   }
 
-				if (image_uri != null) {
-					System.out.println(Uri.parse(image_uri));
-					try {
-						bitmap = MediaStore.Images.Media
-								.getBitmap(this.getContentResolver(),
-										Uri.parse(image_uri));
-						sb.append("\n Image in Bitmap:" + bitmap);
-						System.out.println(bitmap);
-
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-				}
-
-				sb.append("\n........................................");
-				v.add(info);
-				// reset lai cac gia tri
-				mobile = "00null";
-				homephone = "00null";
-				emailContact = "00null";
-				address = "00null";
-				company = "00null";
-			}
-
-		}
+		  }
 		return v;
-	}
+		 }
 	/* __________________________________________________________________________________________________ */
+	
+	
+	
+	/*_________________________________________taocsdlmoivasudung________________________________________ */
+		public void readDatabase()
+		{
+			db=mDBHelper.getReadableDatabase();
+			String [] output= {Feedentry.Id,Feedentry.Name,Feedentry.DiDong,Feedentry.DienThoai,Feedentry.Email,Feedentry.ToChuc,Feedentry.DiaChi};
+			Cursor c = db.query(Feedentry.TableName,output ,null , null, null, null, null);
+			c.moveToFirst();
+			
+			do
+			{
+				Contacter contacter = new Contacter();
+				contacter.SetId(Integer.parseInt(c.getString(0)));
+				contacter.SetName(c.getString(1));
+				contacter.SetDidong(c.getString(2));
+				contacter.SetDienthoai(c.getString(3));
+				contacter.SetEmail(c.getString(4));
+				contacter.SetTochuc(c.getString(5));
+				contacter.SetDiachi(c.getString(6));
+				array.add(contacter);
+				adapter.notifyDataSetChanged();
+			}
+			while(c.moveToNext());
+		}
+		public boolean checkDatabase(int id)
+		{
+			db=mDBHelper.getReadableDatabase();
+			String [] output={Feedentry.Id,Feedentry.Name};
+			String [] wherearg={Integer.toString(id)};
+			String test="";
+			Cursor c = db.query(Feedentry.TableName, output,Feedentry.Id + " = ?" ,wherearg , null, null, null);
+			c.moveToFirst();
+			int so=c.getColumnIndex(Feedentry.Name);
+			do
+			{
+			test=c.getString(c.getColumnIndex(Feedentry.Name));
+			System.out.println(test);
+			}
+			while(c.moveToNext());
+			if(!test.equals(""))
+				return false;
+			return true;
+		}
+		public void writeDatabase(int id, String name, String didong, String dienthoai, String email,String tochuc, String diachi)
+		{
+			db=mDBHelper.getWritableDatabase();
+			ContentValues values = new ContentValues();
+			values.put(Feedentry.Id, id);
+			values.put(Feedentry.Name, name);
+			values.put(Feedentry.DiDong, didong);
+			values.put(Feedentry.DienThoai, dienthoai);
+			values.put(Feedentry.Email, email);
+			values.put(Feedentry.ToChuc, tochuc);
+			values.put(Feedentry.DiaChi, diachi);
+			long newidrow;
+			newidrow= db.insert(Feedentry.TableName, null, values);
+		}
+		public boolean editDatabase(int id,String name, String didong, String dienthoai,String email, String tochuc, String diachi)
+		{
+			db=mDBHelper.getReadableDatabase();
+			ContentValues values= new ContentValues() ;
+			values.put(Feedentry.Name, name);
+			values.put(Feedentry.DiDong, didong);
+			values.put(Feedentry.DienThoai, dienthoai);
+			values.put(Feedentry.Email, email);
+			values.put(Feedentry.ToChuc, tochuc);
+			values.put(Feedentry.DiaChi, diachi);
+			String where = Feedentry._ID + " = ? ";
+			String [] wherearg={Integer.toString(id)};
+			int count =db.update(Feedentry.Name, values, where, wherearg);
+			if(count!=0) return true;
+			return false;
+		}
+		public void search(String name)
+		{
+			array.clear();
+			adapter.notifyDataSetChanged();
+			db=mDBHelper.getReadableDatabase();
+			String [] output= {Feedentry.Id,Feedentry.Name,Feedentry.DiDong,Feedentry.DienThoai,Feedentry.Email,Feedentry.ToChuc,Feedentry.DiaChi};
+			String whereClause= Feedentry.Name + " LIKE ? ";
+			String [] whereArgs= {"%"+name+"%"};
+			Cursor c = db.query(Feedentry.TableName,output , whereClause , whereArgs , null, null, null);
+			c.moveToFirst();
+			do
+			{
+				Contacter contacter = new Contacter();
+				contacter.SetId(Integer.parseInt(c.getString(0)));
+				contacter.SetName(c.getString(1));
+				contacter.SetDidong(c.getString(2));
+				contacter.SetDienthoai(c.getString(3));
+				contacter.SetEmail(c.getString(4));
+				contacter.SetTochuc(c.getString(5));
+				contacter.SetDiachi(c.getString(6));
+				array.add(contacter);
+				adapter.notifyDataSetChanged();
+			}
+			while(c.moveToNext());
+		}
+	/*___________________________________________________________________________________________________ */
 }

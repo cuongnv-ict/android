@@ -41,8 +41,9 @@ public class UpLoadFile extends AsyncTask<Void, Void, Boolean> {
 		try {
 			tempFile = File.createTempFile("FileContact", ".txt", tempDir);
 			fr = new FileWriter(tempFile);
-			Vector v = ac.readContacts2();
-			ArrayList s;
+			Vector v = new Vector();
+				v= ac.readContacts2();
+			ArrayList <?> s;
 			for (int i = 0; i < v.size(); i++) {
 				s = (ArrayList) v.get(i);
 				String data = String.valueOf(s.get(0)) + MATACH
@@ -50,7 +51,8 @@ public class UpLoadFile extends AsyncTask<Void, Void, Boolean> {
 							+ String.valueOf(s.get(2)) + MATACH
 							+ String.valueOf(s.get(3)) + MATACH
 							+ String.valueOf(s.get(4)) + MATACH
-							+ String.valueOf(s.get(5));
+							+ String.valueOf(s.get(5)) + MATACH
+							+ String.valueOf(s.get(6));
 				fr.write(data + "\n");
 			}
 			fr.close();

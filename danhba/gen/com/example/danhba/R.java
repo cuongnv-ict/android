@@ -56,7 +56,8 @@ public final class R {
         public static final int update_contact_machine=0x7f020020;
     }
     public static final class id {
-        public static final int action_settings=0x7f080018;
+        public static final int Search=0x7f08000a;
+        public static final int action_settings=0x7f080019;
         public static final int add_avatar=0x7f080000;
         public static final int add_contact=0x7f080009;
         public static final int add_dc=0x7f080004;
@@ -65,22 +66,22 @@ public final class R {
         public static final int add_email=0x7f080005;
         public static final int add_name=0x7f080001;
         public static final int add_tc=0x7f080006;
-        public static final int backup_dropbox=0x7f08000f;
+        public static final int backup_dropbox=0x7f080010;
         public static final int btn_add_contact=0x7f080007;
-        public static final int btn_contact=0x7f080010;
-        public static final int btn_dn_dropbox=0x7f080014;
-        public static final int btn_setting=0x7f080011;
-        public static final int icon_user=0x7f080015;
+        public static final int btn_contact=0x7f080011;
+        public static final int btn_dn_dropbox=0x7f080015;
+        public static final int btn_setting=0x7f080012;
+        public static final int icon_user=0x7f080016;
         public static final int list=0x7f080008;
-        public static final int list_show=0x7f08000a;
-        public static final int login_dropbox=0x7f08000c;
-        public static final int pass_dropbox=0x7f080013;
-        public static final int setting=0x7f08000b;
-        public static final int telephoneNumber=0x7f080017;
-        public static final int up_dropbox=0x7f08000e;
-        public static final int update_contact_machine=0x7f08000d;
-        public static final int userName=0x7f080016;
-        public static final int user_dropbox=0x7f080012;
+        public static final int list_show=0x7f08000b;
+        public static final int login_dropbox=0x7f08000d;
+        public static final int pass_dropbox=0x7f080014;
+        public static final int setting=0x7f08000c;
+        public static final int telephoneNumber=0x7f080018;
+        public static final int up_dropbox=0x7f08000f;
+        public static final int update_contact_machine=0x7f08000e;
+        public static final int userName=0x7f080017;
+        public static final int user_dropbox=0x7f080013;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
